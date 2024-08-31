@@ -13,5 +13,6 @@ void OpenTalk::connectToWiFi() {
         delay(1000);
         Serial.print(".");
     }
+    Serial.println("");
     Serial.println("Connected to the WiFi network");
 }
