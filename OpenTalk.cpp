@@ -5,9 +5,10 @@ OpenTalk::OpenTalk(const char* ssid, const char* password) {
     _password = password;
 }
 
+//Connecting to Wifi
 void OpenTalk::connectToWiFi() {
     WiFi.begin(_ssid, _password);
-    Serial.println("Connecting to WiFi");
+    Serial.print("Connecting to WiFi");
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
@@ -17,13 +18,21 @@ void OpenTalk::connectToWiFi() {
     Serial.println("Connected to the WiFi network");
 }
 
+//OpenAI Chat Completion
 String OpenTalk::openAIChatCompletion(const char* openAIKey, const char* model, const char* content){
+
+    //Check if connected to the internet
+    if(Wifi.status() != WL_CONNECTED){
+        Serial.println("No Internet - OpenAI Chat Completion failed");
+        return;
+    }
+
     HTTPClient http;
     String response;
 
-    http.begin("https://api.openai.com/v1/chat/completions");
+    http.begin("https://api.openai.com/v1/chat/completions"); //OpenAI Chat Completion Endpoint
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("Authorization", "Bearer " + String(openAIKey));
+    http.addHeader("Authorization", "Bearer " + String(openAIKey)); //OpenAI API Key
 
     String json = "{"
                         "\"model\": \"" + String(model) + "\","
@@ -35,6 +44,7 @@ String OpenTalk::openAIChatCompletion(const char* openAIKey, const char* model, 
                         "]"
                     "}";
 
+    //Send the POST request
     int httpResponseCode = http.POST(json);
 
     if (httpResponseCode > 0) {
